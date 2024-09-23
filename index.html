@@ -4,9 +4,44 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Batch Video URL Extractor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      color: #333;
+    }
+    label {
+      font-weight: bold;
+    }
+    input {
+      padding: 8px;
+      margin: 5px;
+      width: 300px;
+    }
+    button {
+      padding: 10px;
+      background-color: #448EE4;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: green;
+    }
+  </style>
 </head>
 <body>
   <h1>Batch Video URL Extractor</h1>
+  
+  <!-- Form for inputting enrollment number and password -->
   <form id="extractForm">
     <label for="enrollmentNo">Enrollment No:</label>
     <input type="text" id="enrollmentNo" name="enrollmentNo" required><br><br>
@@ -17,24 +52,37 @@
     <button type="submit">Extract Batch URLs</button>
   </form>
 
-  <!-- Response will be displayed here -->
+  <!-- Placeholder for showing the result or download link -->
   <div id="result"></div>
 
   <script>
-    // Simple form submission with fetch to update the result dynamically
+    // Function to handle form submission and interaction with Vercel API
     const form = document.getElementById('extractForm');
     form.addEventListener('submit', async function (event) {
-      event.preventDefault();
+      event.preventDefault();  // Prevent form from refreshing the page
 
+      // Collect form data
       const formData = new FormData(form);
-      const response = await fetch('https://allen-extractor.vercel.app/extract', {  // Replace with ngrok URL or public IP
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(formData),
-      });
 
-      const result = await response.text();
-      document.getElementById('result').innerHTML = result;
+      try {
+        // Make POST request to Vercel-hosted API endpoint
+        const response = await fetch('https://allen-extractor.vercel.app/extract', {  // Replace with your Vercel URL
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(formData),  // Convert form data to URL-encoded format
+        });
+
+        // Handle the response
+        if (response.ok) {
+          const result = await response.text();
+          document.getElementById('result').innerHTML = result;  // Display result in the div
+        } else {
+          document.getElementById('result').innerHTML = 'Error: Unable to extract URLs. Please check your credentials.';
+        }
+      } catch (error) {
+        console.error('Error occurred:', error);
+        document.getElementById('result').innerHTML = 'Error: Unable to extract URLs.';
+      }
     });
   </script>
 </body>
